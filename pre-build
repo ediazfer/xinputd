@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Run this script to generate the build system
+#
+libtoolize
+aclocal
+autoheader
+automake --add-missing
+autoconf
+

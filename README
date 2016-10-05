@@ -1,0 +1,25 @@
+This is an implementation of the xinput gamepad interface.
+It works both in 32 and 64 bits.
+
+The state of the pads have to be shared through multiple applications
+
+    ie: both Steam/32 bits and No Man Sky/64 bits will access the service simultaneously.
+
+I originally wrote this for Wine, but having it as a purely native daemon seemed a nice option.
+
+The first client that comes tries to connect to the xinput server.
+If the xinput server is not running, depending on the build options, it will either
+_ spawn a daemon in its own thread and server other clients (as well as itself)
+_ start a daemon and connect to it (that was the default behaviour under Wine)
+
+If the connection to the daemon is lost, the selection process starts again.
+
+The clients are communicating using a shared memory for getting the sticks and buttons states.
+Rumble commands are sent using a posix message queue (Linux, something will have to be made for OSX)
+
+This project made me realise that mutex and semaphores do NOT interact well between 32 and 64 bits apps on the same machine.
+Given the organic nature of the pads input, mutexes are not so important.
+
+On the TODO list:
+_ change the protocol so clients use only read access to the shared memory
+

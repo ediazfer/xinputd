@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Super cleaner
+#
+
+if [ ! "$1" = "now" ]
+then
+    echo
+    echo READ THIS FIRST:
+    echo
+    echo this scripts deletes every generated file
+    echo make a BACKUP first if you modified anything
+    echo now that you have been properly warned,
+    echo the command takes 'now' as an argument.
+    echo
+    echo ie: ./superclean now
+    exit 1
+fi
+
+echo 'deleting a bunch of files in 5 seconds (last chance for a backup)'
+sleep 5
+
+echo makefiles
+
+for dir in . src
+do
+    cd $dir
+    rm -rf Makefile Makefile.in autom4te.cache
+    cd - > /dev/null
+done
+
+echo configure files
+
+rm -f stamp-h1 aclocal.m4 configure config.log config.h config.h.in config.h.in~ config.status compile depcomp install-sh missing
+rm -f config.guess config.sub ltmain.sh
+
+echo binaries
+
+find -name \*.Po -exec rm -f {} \; > /dev/null 2>&1
+find -name \*.o -exec rm -f {} \; > /dev/null 2>&1
+find -name .deps -exec rm -rf {} \; > /dev/null 2>&1
+find -name .libs -exec rm -rf {} \; > /dev/null 2>&1
+
+rm -f src/xinputd
+rm -rf m4
+
+echo 'done, now you can regenerate all with ./pre-build && ./configure && make'

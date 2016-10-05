@@ -1,0 +1,7 @@
+#!/bin/sh
+make CFLAGS="-O0 -g" CXXFLAGS="-O0 -g"
+if [ $? -eq 0 ]
+then
+    sudo make install CFLAGS="-O0 -g" CXXFLAGS="-O0 -g"
+fi
+
