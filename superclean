@@ -38,11 +38,20 @@ echo binaries
 
 find -name \*.Po -exec rm -f {} \; > /dev/null 2>&1
 find -name \*.o -exec rm -f {} \; > /dev/null 2>&1
+find -name \*.lo -exec rm -f {} \; > /dev/null 2>&1
+find -name \*.la -exec rm -f {} \; > /dev/null 2>&1
+find -name Makefile.in -exec rm -f {} \; > /dev/null 2>&1
+find -name Makefile -exec rm -f {} \; > /dev/null 2>&1
 find -name .deps -exec rm -rf {} \; > /dev/null 2>&1
 find -name .libs -exec rm -rf {} \; > /dev/null 2>&1
 
+rm -f src/config.h.in
+rm -f src/stamp-h1
 rm -f src/xinputd
 rm -rf m4
 rm -f libtool
+
+rm -f test/xinput-test-gui/xinput-gui-test
+rm -f test/xinput-test/xinput-test
 
 echo 'done, now you can regenerate all with ./pre-build && ./configure && make'
