@@ -17,8 +17,8 @@ then
     exit 1
 fi
 
-echo 'deleting a bunch of files in 5 seconds (last chance for a backup)'
-sleep 5
+echo 'deleting a bunch of files in 2 seconds (last chance for a backup)'
+sleep 2
 
 echo makefiles
 
@@ -43,5 +43,6 @@ find -name .libs -exec rm -rf {} \; > /dev/null 2>&1
 
 rm -f src/xinputd
 rm -rf m4
+rm -f libtool
 
 echo 'done, now you can regenerate all with ./pre-build && ./configure && make'

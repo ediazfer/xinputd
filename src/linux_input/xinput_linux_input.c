@@ -42,10 +42,9 @@
 #include "tools.h"
 
 #include "xinput_linux_input.h"
-#include "xinput_linux_input_xboxpad.h"
+//#include "xinput_linux_input_xboxpad.h"
 #include "xinput_linux_input_generic.h"
-
-#include "xinput_linux_input_xboxpad_2.h" /* an example with table implementation */
+//#include "xinput_linux_input_xboxpad_2.h" /* an example with table implementation */
 
 #include "xinput_linux_input_debug.h"
 
