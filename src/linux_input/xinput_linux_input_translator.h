@@ -58,6 +58,14 @@ void xinput_linux_input_translator_abs_translate_to_axis(const struct xinput_lin
 void xinput_linux_input_translator_abs_translate_to_axis_reverse(const struct xinput_linux_input_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX*, int16_t value);
 void xinput_linux_input_translator_abs_translate_to_buttons(const struct xinput_linux_input_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX*, int16_t value);
 
+void xinput_gamepad_abs_set_axis(struct xinput_linux_input_translator_abs_translator *abs, int bit, ssize_t offs);
+void xinput_gamepad_abs_set_sixa(struct xinput_linux_input_translator_abs_translator *abs, int bit, ssize_t offs);
+void xinput_gamepad_abs_set_bttn(struct xinput_linux_input_translator_abs_translator *abs, int bit, int16_t pos, int16_t neg);
+
+#define XINPUT_GAMEPAD_ABS_SET_AXIS(_abs, _bit, _field) xinput_gamepad_abs_set_axis((_abs),(_bit), offsetof(XINPUT_GAMEPAD_EX, _field))
+#define XINPUT_GAMEPAD_ABS_SET_SIXA(_abs, _bit, _field) xinput_gamepad_abs_set_sixa((_abs),(_bit), offsetof(XINPUT_GAMEPAD_EX, _field))
+#define XINPUT_GAMEPAD_ABS_SET_BTTN(_abs, _bit, _pos, _neg) xinput_gamepad_abs_set_bttn((_abs),(_bit), (_pos), (_neg))
+
 /*
  * Starts the table
  */

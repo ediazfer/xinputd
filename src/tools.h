@@ -93,6 +93,16 @@ static inline BOOL bit_get(const uint8_t* array, int bit)
     return (array[bit >> 3] & (1 << (bit & 7))) != 0;
 }
 
+static inline void bit_clear(uint8_t* array, int bit)
+{
+    array[bit >> 3] &= ~(1 << (bit & 7));
+}
+
+static inline void bit_set(uint8_t* array, int bit)
+{
+    array[bit >> 3] |= (1 << (bit & 7));
+}
+
 #ifdef __cplusplus
 }
 #endif

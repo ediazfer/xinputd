@@ -351,12 +351,12 @@ static struct xinput_driver_supported_device xboxpad_factories[] =
     }
 };
 
-BOOL xinput_linux_input_xboxpad_can_translate(const struct input_id* id)
+BOOL xinput_linux_input_xboxpad_can_translate(const struct xinput_linux_input_probe_s* probed)
 {
     for(int i = 0; xboxpad_factories[i].vendor != 0; ++i)
     {
-        if( (xboxpad_factories[i].vendor == id->vendor) &&
-            (xboxpad_factories[i].product == id->product) )
+        if( (xboxpad_factories[i].vendor == probed->id.vendor) &&
+            (xboxpad_factories[i].product == probed->id.product) )
         {
             return TRUE;
         }
@@ -365,12 +365,12 @@ BOOL xinput_linux_input_xboxpad_can_translate(const struct input_id* id)
     return FALSE;
 }
 
-BOOL xinput_linux_input_xboxpad_new_instance(const struct input_id* id, int fd, xinput_gamepad_device* instance)
+BOOL xinput_linux_input_xboxpad_new_instance(const struct xinput_linux_input_probe_s* probed, int fd, xinput_gamepad_device* instance)
 {
     for(int i = 0; i < 4; ++i)
     {
-        if( (xboxpad_factories[i].vendor == id->vendor) &&
-            (xboxpad_factories[i].product == id->product) )
+        if( (xboxpad_factories[i].vendor == probed->id.vendor) &&
+            (xboxpad_factories[i].product == probed->id.product) )
         {
             xboxpad_factories[i].initialize(instance, fd);
             return TRUE;

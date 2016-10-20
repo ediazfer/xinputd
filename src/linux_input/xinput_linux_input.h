@@ -29,11 +29,28 @@
 
 #include <stdint.h>
 #include "xinput_gamepad.h"
+#include <linux/input.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct xinput_linux_input_probe_s
+{
+    struct input_id id;
+    int version;
+    int abs_count;
+    int key_count;
+    int ff_count;
+    uint8_t prop[INPUT_PROP_MAX];
+    uint8_t ev_all[EV_CNT>>3];
+    uint8_t ev_key[KEY_CNT>>3];
+    uint8_t ev_abs[ABS_CNT>>3];
+    uint8_t ev_ff[FF_CNT>>3];
+    char device_name[128];
+    char location[128];  
+};
+    
 /**
  * Initialises the linux input
  *
@@ -86,6 +103,7 @@ void xinput_linux_input_finalize(void);
 #define xinput_driver_finalize xinput_linux_input_finalize
 
 struct input_event;
+
 int xinput_linux_input_read_next(int fd, struct input_event* ie);
 
 /**

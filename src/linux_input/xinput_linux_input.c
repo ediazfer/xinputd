@@ -43,6 +43,7 @@
 
 #include "xinput_linux_input.h"
 #include "xinput_linux_input_xboxpad.h"
+#include "xinput_linux_input_generic.h"
 
 #include "xinput_linux_input_xboxpad_2.h" /* an example with table implementation */
 
@@ -154,26 +155,18 @@ static BOOL xinput_linux_input_device_in_use(int input_index)
  * @return
  */
 
+typedef struct xinput_linux_input_probe_s xinput_linux_input_probe_s;
+
 uint32_t xinput_linux_input_probe(void)
 {
     uint64_t now = timeus();
     int n;
     int fd;
-    int version;
-    int abs_count;
-    int key_count;
-    int ff_count;
+        
     int one = 1;
     uint32_t mask = 0;
-    struct input_id id;
-
-    uint8_t prop[INPUT_PROP_MAX];
-    uint8_t ev_all[EV_CNT>>3];
-    uint8_t ev_key[KEY_CNT>>3];
-    uint8_t ev_abs[ABS_CNT>>3];
-    uint8_t ev_ff[FF_CNT>>3];
-    char device_name[128];
-    char location[128];
+    
+    struct xinput_linux_input_probe_s probed;
     char filename[128];
 
     if(now - xinput_linux_input_probe_last_epoch < 5000000)
@@ -182,15 +175,6 @@ uint32_t xinput_linux_input_probe(void)
     }
     
     /* to silence valgrind */
-    
-    memset(prop,0,sizeof(prop));
-    memset(ev_all,0,sizeof(ev_all));
-    memset(ev_key,0,sizeof(ev_key));
-    memset(ev_abs,0,sizeof(ev_abs));
-    memset(ev_ff,0,sizeof(ev_ff));
-    memset(device_name,0,sizeof(device_name));
-    memset(location,0,sizeof(location));
-    memset(filename,0,sizeof(filename));    
 
     xinput_linux_input_probe_last_epoch = now;
 
@@ -224,56 +208,58 @@ uint32_t xinput_linux_input_probe(void)
             /*  TRACE("no joystick at %s\n", filename); */
             continue;
         }
+        
+        memset(&probed, 0, sizeof(struct xinput_linux_input_probe_s));
 
 #if XINPUT_TRACE_DEVICE_DETECTION
         TRACE("opened joystick at %s\n", filename);
 #endif
 
-        if(ioctl(fd, EVIOCGVERSION, &version) != -1)
+        if(ioctl(fd, EVIOCGVERSION, &probed.version) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE("version: %x\n", version);
+            TRACE("version: %x\n", probed.version);
 #endif
         }
 
-        if(ioctl(fd, EVIOCGID, &id) != -1)
+        if(ioctl(fd, EVIOCGID, &probed.id) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE("id: %x %x %x %x\n", id.bustype, id.product, id.vendor, id.version);
+            TRACE("id: %x %x %x %x\n", probed.id.bustype, probed.id.product, probed.id.vendor, probed.id.version);
 #endif
         }
 
-        if(ioctl(fd, EVIOCGNAME(sizeof(device_name)), device_name) != -1)
+        if(ioctl(fd, EVIOCGNAME(sizeof(probed.device_name)), probed.device_name) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE("name: '%s'\n", device_name);
+            TRACE("name: '%s'\n", probed.device_name);
 #endif
         }
 
-        if(ioctl(fd, EVIOCGPHYS(sizeof(location)), location) != -1)
+        if(ioctl(fd, EVIOCGPHYS(sizeof(probed.location)), probed.location) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE("loc: '%s'\n", location);
+            TRACE("loc: '%s'\n", probed.location);
 #endif
         }
 
-        if((n = ioctl(fd, EVIOCGPROP(sizeof(prop)), prop)) != -1)
+        if((n = ioctl(fd, EVIOCGPROP(sizeof(probed.prop)), probed.prop)) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
             TRACE("prop: %i\n", n);
-            hexdump(prop, n);
+            hexdump(probed.prop, n);
             TRACE("\n");
 #endif
         }
 
-        if((n = ioctl(fd, EVIOCGBIT(0, EV_CNT), ev_all)) != -1)
+        if((n = ioctl(fd, EVIOCGBIT(0, EV_CNT), probed.ev_all)) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            memdump(ev_all, sizeof(ev_all));
+            memdump(probed.ev_all, sizeof(probed.ev_all));
 
             for(int j = 0; j < EV_CNT; ++j)
             {
-                BOOL on = bit_get(ev_all, j);
+                BOOL on = bit_get(probed.ev_all, j);
                 if(on)
                 {
                     TRACE("%s ", xinput_linux_input_event_type_get_name(j)); /* no LF */
@@ -288,38 +274,38 @@ uint32_t xinput_linux_input_probe(void)
 #endif
         }
 
-        if(!(bit_get(ev_all, EV_KEY) && bit_get(ev_all, EV_ABS)))
+        if(!(bit_get(probed.ev_all, EV_KEY) && bit_get(probed.ev_all, EV_ABS)))
         {
             TRACE("%s @%s: no buttons nor absolute axe(s)\n",
-                    device_name,
+                    probed.device_name,
                     filename);
             close_ex(fd);
             continue;
         }
 
-        key_count = 0;
-        abs_count = 0;
-        ff_count = 0;
+        probed.key_count = 0;
+        probed.abs_count = 0;
+        probed.ff_count = 0;
 
-        if((n = ioctl(fd, EVIOCGBIT(EV_KEY, KEY_CNT), ev_key)) != -1)
+        if((n = ioctl(fd, EVIOCGBIT(EV_KEY, KEY_CNT), probed.ev_key)) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            memdump(ev_key, sizeof(ev_key));
+            memdump(probed.ev_key, sizeof(probed.ev_key));
 #endif
             for(int j = 0; j < KEY_CNT; ++j)
             {
-                BOOL on = bit_get(ev_key, j);
+                BOOL on = bit_get(probed.ev_key, j);
                 if(on)
                 {
 #if XINPUT_TRACE_DEVICE_DETECTION
                     TRACE("%s ", xinput_linux_input_key_get_name(j)); /* no LF */
 #endif
-                    ++key_count;
+                    ++probed.key_count;
                 }
             }
 
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE(": %i keys\n", key_count);
+            TRACE(": %i keys\n", probed.key_count);
 #endif
         }
         else
@@ -329,24 +315,24 @@ uint32_t xinput_linux_input_probe(void)
 #endif
         }
 
-        if((n = ioctl(fd, EVIOCGBIT(EV_ABS, ABS_CNT), ev_abs)) != -1)
+        if((n = ioctl(fd, EVIOCGBIT(EV_ABS, ABS_CNT), probed.ev_abs)) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            memdump(ev_abs, sizeof(ev_abs));
+            memdump(probed.ev_abs, sizeof(probed.ev_abs));
 #endif
             for(int j = 0; j < ABS_CNT; ++j)
             {
-                BOOL on = bit_get(ev_abs, j);
+                BOOL on = bit_get(probed.ev_abs, j);
                 if(on)
                 {
 #if XINPUT_TRACE_DEVICE_DETECTION
                     TRACE("%s ", xinput_linux_input_abs_get_name(j)); /* no LF */
 #endif
-                    ++abs_count;
+                    ++probed.abs_count;
                 }
             }
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE(": %i abs\n", abs_count);
+            TRACE(": %i abs\n", probed.abs_count);
 #endif
         }
         else
@@ -356,24 +342,24 @@ uint32_t xinput_linux_input_probe(void)
 #endif
         }
 
-        if((n = ioctl(fd, EVIOCGBIT(EV_FF, FF_CNT), ev_ff)) != -1)
+        if((n = ioctl(fd, EVIOCGBIT(EV_FF, FF_CNT), probed.ev_ff)) != -1)
         {
 #if XINPUT_TRACE_DEVICE_DETECTION
-            memdump(ev_ff, sizeof(ev_ff));
+            memdump(probed.ev_ff, sizeof(probed.ev_ff));
 #endif
             for(int j = 0; j < FF_CNT; ++j)
             {
-                BOOL on = bit_get(ev_ff, j);
+                BOOL on = bit_get(probed.ev_ff, j);
                 if(on)
                 {
 #if XINPUT_TRACE_DEVICE_DETECTION
                     TRACE("%s ", xinput_linux_input_ff_get_name(j)); /* no LF */
 #endif
-                    ++ff_count;
+                    ++probed.ff_count;
                 }
             }
 #if XINPUT_TRACE_DEVICE_DETECTION
-            TRACE(": %i ff\n", ff_count);
+            TRACE(": %i ff\n", probed.ff_count);
 #endif
         }
 
@@ -385,12 +371,20 @@ uint32_t xinput_linux_input_probe(void)
             continue;
         }
 
-        if(xinput_linux_input_xboxpad_can_translate(&id))
+        if(xinput_linux_input_generic_can_translate(&probed))
         {
             xinput_gamepad_device* device = &xinput_linux_input_slot[slot].device;
-            xinput_linux_input_xboxpad_new_instance(&id, fd, device);
+            xinput_linux_input_generic_new_instance(&probed, fd, device);
             xinput_linux_input_slot[slot].input_index = input_index;
         }
+        /*
+        if(xinput_linux_input_xboxpad_can_translate(&probed))
+        {
+            xinput_gamepad_device* device = &xinput_linux_input_slot[slot].device;
+            xinput_linux_input_xboxpad_new_instance(&probed, fd, device);
+            xinput_linux_input_slot[slot].input_index = input_index;
+        }
+        */
         /*
         else if(xinput_linux_input_xboxpad2_can_translate(&id))
         {

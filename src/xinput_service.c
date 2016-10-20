@@ -102,8 +102,6 @@ static xinput_shared_gamepad_state* service_shared = NULL;
 
 static volatile int xinput_service_idle_strikes = XINPUT_IDLE_CLIENT_STRIKES;
 
-static BOOL xinput_service_auto_disconnect = TRUE;
-
 #if !XINPUT_RUNDLL
 static pthread_t service_thread_id = 0;
 #endif
@@ -440,7 +438,7 @@ static void* xinput_service_thread(void* args_)
     (void)args_;
     for(;;)
     {
-        if(xinput_service_auto_disconnect && (xinput_service_idle_strikes > 0))
+        if(xinput_service_idle_strikes > 0)
         {
             int64_t now = timeus();
 
@@ -769,11 +767,6 @@ BOOL xinput_service_self(void)
     return service_shared != NULL;
 }
 
-void xinput_service_set_auto_disconnect(BOOL enable)
-{
-    xinput_service_auto_disconnect = enable;
-}
-
 static BOOL xinput_service_acquire_lock(void)
 {
     int ret;
@@ -885,7 +878,7 @@ void xinput_service_rundll(void)
     }
     free(cmd);
 #else
-    xinput_service_set_auto_disconnect(FALSE);
+    //xinput_service_set_autoshutdown(0);
     
     pthread_t tid;
     if(pthread_create(&tid, NULL, xinput_service_server_thread, NULL) == 0)

@@ -108,4 +108,28 @@ xinput_linux_input_translator_key_input_event_to_gamepad(const struct xinput_lin
     }
 }
 
+void xinput_gamepad_abs_set_axis(struct xinput_linux_input_translator_abs_translator *abs, int bit, ssize_t offs)
+{
+    abs->_item[bit].translate = &xinput_linux_input_translator_abs_translate_to_axis;
+    abs->_item[bit].to = offs;
+    abs->_item[bit].positive = 0;
+    abs->_item[bit].negative = 0;
+}
+
+void xinput_gamepad_abs_set_sixa(struct xinput_linux_input_translator_abs_translator *abs, int bit, ssize_t offs)
+{
+    abs->_item[bit].translate = &xinput_linux_input_translator_abs_translate_to_axis_reverse;
+    abs->_item[bit].to = offs;
+    abs->_item[bit].positive = 0;
+    abs->_item[bit].negative = 0;
+}
+
+void xinput_gamepad_abs_set_bttn(struct xinput_linux_input_translator_abs_translator *abs, int bit, int16_t pos, int16_t neg)
+{
+    abs->_item[bit].translate = &xinput_linux_input_translator_abs_translate_to_buttons;
+    abs->_item[bit].to = 0;
+    abs->_item[bit].positive = pos;
+    abs->_item[bit].negative = neg;
+}
+
 #endif /* HAVE_LINUX_INPUT_H */

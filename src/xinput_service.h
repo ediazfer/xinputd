@@ -86,8 +86,6 @@ typedef struct xinput_gamepad_vibration xinput_gamepad_vibration;
 
 BOOL xinput_service_self(void);
 
-void xinput_service_set_auto_disconnect(BOOL enable);
-
 void xinput_service_rundll(void);
 
 void xinput_service_server(void);

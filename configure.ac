@@ -4,7 +4,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([xinputd], [0.1], [eric.diaz.fernandez@gmail.com])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
 
 AC_CONFIG_MACRO_DIRS([m4])
