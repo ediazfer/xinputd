@@ -40,9 +40,9 @@
 
 #if !HAVE_WINE
 
-typedef int (*printf_callback)(const char*,...);
+typedef void (*printf_callback)(const char*,...);
 
-static int xinput_printf(const char *text, ...)
+static void xinput_printf(const char *text, ...)
 {
     va_list args;
     va_start(args, text);

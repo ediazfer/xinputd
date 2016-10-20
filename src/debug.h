@@ -47,7 +47,7 @@ WINE_DEFAULT_DEBUG_CHANNEL(xinput);
 extern "C" {
 #endif
 
-typedef int (*printf_callback)(const char*,...);
+typedef void (*printf_callback)(const char*,...);
 
 #if !XINPUT_DEBUG_C_
 extern printf_callback trace_printf;

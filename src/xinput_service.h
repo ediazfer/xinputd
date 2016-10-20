@@ -108,10 +108,9 @@ int xinput_service_poke(void);
  * 0 to disable
  * 
  * @param strikes
- * @return 
  */
 
-int xinput_service_set_autoshutdown(int strikes);
+void xinput_service_set_autoshutdown(int strikes);
 
 #ifdef __cplusplus
 }

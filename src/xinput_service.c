@@ -888,7 +888,7 @@ void xinput_service_rundll(void)
 #endif
 }
 
-int xinput_service_set_autoshutdown(int strikes)
+void xinput_service_set_autoshutdown(int strikes)
 {
     xinput_service_idle_strikes = strikes;
 }

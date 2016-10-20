@@ -2,7 +2,15 @@
 #
 # Run this script to generate the build system
 #
-libtoolize
+
+OS=$(uname -s)
+
+if [ ! "$OS" = "Darwin" ]
+then
+    libtoolize
+else
+    glibtoolize
+fi
 aclocal
 autoheader
 automake --add-missing
