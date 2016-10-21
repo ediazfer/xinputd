@@ -15,6 +15,11 @@ LT_INIT
 AC_PROG_CC
 AC_PROG_CXX
 
+# Check for OS
+
+AM_CONDITIONAL([OS_LINUX], [ [[ $(uname) = "Linux" ]] ])
+AM_CONDITIONAL([OS_OSX], [ [[ $(uname) = "Darwin" ]] ])
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -73,11 +78,16 @@ then
         AC_DEFINE(HAVE_WX_CONFIG, 1, [Define to 1 if wxWidgets is present])
         AC_SUBST(WX_CXXFLAGS, "$wx_cxxflags")
         AC_SUBST(WX_LIBS, "$wx_libs")
+
+	AM_CONDITIONAL([WXWIDGETS], [ true ])
     else
         AC_MSG_RESULT([misconfigured?])
+
+	AM_CONDITIONAL([WXWIDGETS], [ false ])
     fi
 else
     AC_MSG_RESULT([no])
+    AM_CONDITIONAL([WXWIDGETS], [ false ])
 fi
 #
 
