@@ -3,7 +3,7 @@ bin_PROGRAMS=xinput-gui-test
 xinput_gui_testdir=@datadir@/xinput
 
 xinput_gui_test_CPPFLAGS=$(WX_CXXFLAGS) -I$(INCLUDEDIR) -DXINPUT
-xinput_gui_test_LDADD=$(WX_LIBS) -lxinput
+xinput_gui_test_LDADD=$(WX_LIBS) -L../../src -lxinput
 xinput_gui_test_SOURCES=wxXinputApp.cpp wxXinputMain.cpp
 noinst_HEADERS=wxXinputApp.h wxXinputMain.h
 
