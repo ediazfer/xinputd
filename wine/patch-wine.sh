@@ -1,6 +1,12 @@
 #!/bin/sh
 
-WINE_SOURCES=/tmp/wine
+if [ "$1" = "" ]
+then
+    echo "usage: ./patch-wine.sh wine-source-path" 1>&2
+    exit 1
+fi
+
+WINE_SOURCES="$1"
 
 dod()
 {
@@ -18,7 +24,7 @@ then
     exit 1
 fi
 
-if [ ! -d "$WINE_SOURCES/configure.ac" ]
+if [ ! -f "$WINE_SOURCES/configure.ac" ]
 then
     echo "expected 'configure.ac' file in '$WINE_SOURCES'" 1>&2
     exit 2
@@ -40,11 +46,11 @@ mkdir -p "$dlldir/linux_input"
 
 dod "could not create '$dlldir/linux_input'"
 
-cp "linux_input/*.{c,h}" "$dlldir/linux_input"
+cp ../src/linux_input/*.{c,h} "$dlldir/linux_input"
 
 dod "could not copy linux-specific source files to '$dlldir'"
 
-cp "*.{c,h}" "$dlldir"
+cp ../src/*.{c,h} "$dlldir"
 
 dod "could not copy source files to '$dlldir'"
 
