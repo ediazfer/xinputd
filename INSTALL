@@ -1,1 +1,41 @@
-/usr/share/automake-1.15/INSTALL
+How to build and install:
+
+./pre-build && ./configure && make && sudo make install
+
+And that's it.
+
+--
+
+In detail:
+
+Generate the configure and various Makfile files:
+
+    ./pre-build
+
+Gather the configuration of the current system for the build
+
+    ./configure
+
+Build the binaries
+
+    make
+
+Install the binaries
+
+    sudo make install
+
+--
+
+Debug install:
+
+To generate debug binaries, the "build" and "install" steps above can be replaced by:
+
+    ./make-debug
+
+a.k.a:
+
+    make CFLAGS="-O0 -g" CXXFLAGS="-O0 -g"
+
+    sudo make install CFLAGS="-O0 -g" CXXFLAGS="-O0 -g"
+
+
