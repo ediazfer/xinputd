@@ -91,6 +91,20 @@ else
 fi
 #
 
+AC_ARG_ENABLE([wine], AS_HELP_STRING([--enable-wine], [Enable WINE code]))
+AS_IF([test "x$enable_wine" = "xyes"],
+      [
+        AM_CONDITIONAL([HAVE_WINE], [ true ])
+        AC_DEFINE_UNQUOTED([HAVE_WINE], [1], "Set to 1 for code running in WINE")
+        AC_SUBST([HAS_WINE])
+      ],
+      [
+        AM_CONDITIONAL([HAVE_WINE], [ false ])
+        AC_DEFINE_UNQUOTED([HAVE_WINE], [0], "Set to 1 for code running in WINE")
+        AC_SUBST([HAS_WINE])
+      ]
+      )
+
 dnl AC_CONFIG_SRCDIR([src test/xinput-test test/xinput-test-gui])
 AC_CONFIG_FILES([Makefile src/Makefile test/xinput-test/Makefile test/xinput-test-gui/Makefile])
 AC_OUTPUT

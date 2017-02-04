@@ -112,22 +112,30 @@
 #define VK_PAD_RTHUMB_DOWNRIGHT VK_PAD_ITEM(54)
 #define VK_PAD_RTHUMB_DOWNLEFT VK_PAD_ITEM(55)
 
+#if HAVE_WINE
+#include <winerror.h>
+#else
 #define ERROR_SUCCESS 0
 #define ERROR_NOT_SUPPORTED -1
 #define ERROR_BAD_ARGUMENTS -1
 #define ERROR_DEVICE_NOT_CONNECTED -1
 #define ERROR_EMPTY -1
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if HAVE_WINE
+#include <guiddef.h>
+#else
 typedef struct _GUID {
   DWORD Data1;
   WORD  Data2;
   WORD  Data3;
   BYTE  Data4[8];
 } GUID;
+#endif
 
 typedef struct _XINPUT_BATTERY_INFORMATION {
   BYTE BatteryType;

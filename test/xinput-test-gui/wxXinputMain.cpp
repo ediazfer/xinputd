@@ -104,8 +104,7 @@ wxXinputDialog::wxXinputDialog(wxWindow* parent,wxWindowID id)
     _pad_selected = -1;
     
     wxString cwd = wxGetCwd();
-    wxString dir = wxStandardPaths::Get().GetInstallPrefix().Append("/"
-            "share/xinput");
+    wxString dir = wxStandardPaths::Get().GetInstallPrefix().Append("/share/xinput");
     wxSetWorkingDirectory(dir);
     
     //(*Initialize(wxXinputDialog)

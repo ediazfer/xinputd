@@ -207,7 +207,6 @@ static int xinput_gamepad_service_is_alive(void)
 
     for(int i = 5; i >= 0; --i)
     {
-        
         pid = client_shared->master_pid;
 
         /* if the pid is 0, the shared memory has not been set yet */

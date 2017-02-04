@@ -30,8 +30,12 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "xinput_settings.h"
+
 #if HAVE_WINE
-WINE_DEFAULT_DEBUG_CHANNEL(xinput);
+
+//WINE_DEFAULT_DEBUG_CHANNEL(xinput);
+
 #else
 #define WINAPI
 #define DECLSPEC_HOTPATCH

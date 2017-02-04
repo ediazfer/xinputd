@@ -27,7 +27,12 @@
 #ifndef XINPUT_SETTINGS_H
 #define XINPUT_SETTINGS_H
 
-#define HAVE_WINE 0
+#ifdef __WINESRC__
+#ifdef HAVE_WINE
+#undef HAVE_WINE
+#endif
+#define HAVE_WINE 1
+#endif
 
 /**
  * TRACE the device input state from the reading threads.

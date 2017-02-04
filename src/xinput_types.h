@@ -27,7 +27,11 @@
 #ifndef XINPUT_TYPES_H
 #define XINPUT_TYPES_H
 
+#if HAVE_WINE
+#include <windef.h>
+#else
 #ifndef WINVER
+
 #include <stdint.h>
 #define TRUE 1
 #define FALSE 0
@@ -43,7 +47,7 @@ typedef unsigned int UINT;
 typedef SHORT* LPWSTR;
 
 #define WINAPI // __attribute__((stdcall))
-
+#endif // WINVER
 #endif
 
 #endif /* XINPUT_TYPES_H */

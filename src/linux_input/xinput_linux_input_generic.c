@@ -234,18 +234,18 @@ static void xinput_linux_input_generic_init(struct xinput_gamepad_device* device
 
 static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input_probe_s* probedp, xinput_linux_input_generic_data *data)
 {
-    uint8_t ev_key[KEY_CNT>>3];
-    uint8_t ev_abs[ABS_CNT>>3];
-    
-    memcpy(ev_key, probedp->ev_key, sizeof(ev_key));
-    memcpy(ev_abs, probedp->ev_abs, sizeof(ev_abs));
-    
-    struct xinput_linux_input_translator_abs_translator local_abs;
-    SHORT local_key_buttons[KEY_CNT];
-    
-    
     struct xinput_linux_input_translator_abs_translator *abs;
     SHORT *key_buttons;
+    SHORT local_key_buttons[KEY_CNT];
+    WORD buttons = XINPUT_GAMEPAD_RESERVED0;
+    static const WORD BUTTONS_ALL = ((WORD)~0);
+    BYTE axis = 0;  // TLX, TLY, TRX, TRY, TL, TR : 1 -> 32
+    uint8_t ev_key[KEY_CNT>>3];
+    uint8_t ev_abs[ABS_CNT>>3];
+    struct xinput_linux_input_translator_abs_translator local_abs;
+
+    memcpy(ev_key, probedp->ev_key, sizeof(ev_key));
+    memcpy(ev_abs, probedp->ev_abs, sizeof(ev_abs));
  
     if(data != NULL)
     {
@@ -262,8 +262,6 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
         key_buttons = &local_key_buttons[0];
     }
     
-    WORD buttons = XINPUT_GAMEPAD_RESERVED0;
-    BYTE axis = 0;  // TLX, TLY, TRX, TRY, TL, TR : 1 -> 32
     
     memset(abs, 0, sizeof(local_abs));
     memset(key_buttons, 0, sizeof(local_key_buttons));
@@ -323,7 +321,7 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
     // specific analogic to button translation
     
     if((buttons & (XINPUT_GAMEPAD_DPAD_RIGHT|XINPUT_GAMEPAD_DPAD_LEFT|XINPUT_GAMEPAD_DPAD_DOWN|XINPUT_GAMEPAD_DPAD_UP)) ==
-            XINPUT_GAMEPAD_DPAD_RIGHT|XINPUT_GAMEPAD_DPAD_LEFT|XINPUT_GAMEPAD_DPAD_DOWN|XINPUT_GAMEPAD_DPAD_UP)
+            (XINPUT_GAMEPAD_DPAD_RIGHT|XINPUT_GAMEPAD_DPAD_LEFT|XINPUT_GAMEPAD_DPAD_DOWN|XINPUT_GAMEPAD_DPAD_UP))
     {
         if(bit_get(ev_abs, ABS_HAT0X) && bit_get(ev_abs, ABS_HAT0Y))
         {
@@ -363,8 +361,9 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
     // now my on a first-come first-serve
     
     {
+        static const SHORT BUTTONS_ALL_MASK = (SHORT)~0;
         int pad = 1;
-        for(int btn_index = 0; (buttons != ~0) && (btn_index < KEY_CNT); ++btn_index)
+        for(int btn_index = 0; (buttons != BUTTONS_ALL_MASK) && (btn_index < KEY_CNT); ++btn_index)
         {
             if(bit_get(ev_key, btn_index))
             {
@@ -426,8 +425,7 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
         }
     }
     
-    const WORD buttons_all = ~0;
-    return (buttons == buttons_all) && (axis == ABS_ALL);
+    return (buttons == BUTTONS_ALL) && (axis == ABS_ALL);
 }
 
 BOOL xinput_linux_input_generic_can_translate(const struct xinput_linux_input_probe_s* probed)
@@ -438,8 +436,9 @@ BOOL xinput_linux_input_generic_can_translate(const struct xinput_linux_input_pr
 BOOL xinput_linux_input_generic_new_instance(const struct xinput_linux_input_probe_s* probed, int fd, xinput_gamepad_device* instance)
 {
     xinput_linux_input_generic_data *data = (xinput_linux_input_generic_data*)malloc(sizeof(xinput_linux_input_generic_data));
+    BOOL ret;
     memset(data, 0, sizeof(xinput_linux_input_generic_data));
-    BOOL ret = xinput_linux_input_generic_translate(probed, data);
+    ret = xinput_linux_input_generic_translate(probed, data);
     if(ret)
     {
         data->fd = fd;
