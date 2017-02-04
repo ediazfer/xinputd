@@ -1,0 +1,25 @@
+diff -urN wine-2.0/configure.ac wine-2.0-xinputd/configure.ac
+--- wine-2.0/configure.ac	2017-01-24 21:17:22.000000000 +0100
++++ wine-2.0-xinputd/configure.ac	2017-01-27 11:47:55.541421544 +0100
+@@ -2108,6 +2108,20 @@
+                 test "$ac_res" = "none required" || AC_SUBST(RT_LIBS,"$ac_res")])
+ LIBS=$ac_save_LIBS
+ 
++dnl Check for shm_open which may be in -lrt
++ac_save_LIBS=$LIBS
++AC_SEARCH_LIBS(shm_open, rt,
++               [AC_DEFINE(HAVE_SHM_OPEN, 1, [Define to 1 if you have the `shm_open' function.])
++                               test "$ac_res" = "none required" || AC_SUBST(SHM_LIBS,"$ac_res")])
++LIBS=$ac_save_LIBS
++
++dnl Check for mq_open which may be in -lrt
++ac_save_LIBS=$LIBS
++AC_SEARCH_LIBS(mq_open, rt,
++               [AC_DEFINE(HAVE_MQ_OPEN, 1, [Define to 1 if you have the `mq_open' function.])
++                               test "$ac_res" = "none required" || AC_SUBST(MQ_LIBS,"$ac_res")])
++LIBS=$ac_save_LIBS
++
+ dnl **** Check for OpenLDAP ***
+ AC_SUBST(LDAP_LIBS,"")
+ if test "$ac_cv_header_ldap_h" = "yes" -a "$ac_cv_header_lber_h" = "yes"
+
