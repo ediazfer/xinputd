@@ -40,7 +40,9 @@ find -name \*.Po -exec rm -f {} \; > /dev/null 2>&1
 find -name \*.o -exec rm -f {} \; > /dev/null 2>&1
 find -name \*.lo -exec rm -f {} \; > /dev/null 2>&1
 find -name \*.la -exec rm -f {} \; > /dev/null 2>&1
-find -name Makefile.in -exec rm -f {} \; > /dev/null 2>&1
+find src -name Makefile.in -exec rm -f {} \; > /dev/null 2>&1
+find test -name Makefile.in -exec rm -f {} \; > /dev/null 2>&1
+rm -f Makefile.in
 find -name Makefile -exec rm -f {} \; > /dev/null 2>&1
 find -name .deps -exec rm -rf {} \; > /dev/null 2>&1
 find -name .libs -exec rm -rf {} \; > /dev/null 2>&1
