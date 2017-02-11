@@ -1,0 +1,56 @@
+--- a/PKGBUILD	2017-02-11 18:30:59.000000000 +0100
++++ b/PKGBUILD	2017-02-11 14:01:07.183449518 +0100
+@@ -11,10 +11,10 @@
+ 
+ _pkgbasever=${pkgver/rc/-rc}
+ 
+-source=("https://github.com/wine-compholio/wine-patched/archive/staging-$_pkgbasever.tar.gz"
++source=(wine-staging-2.1.tar.xz
+         30-win32-aliases.conf)
+-sha1sums=('d7df806d6598be1e818413224e1d281d008879e8'
+-          '023a5c901c6a091c56e76b6a62d141d87cce9fdb')
++sha1sums=(SKIP
++          SKIP)
+ 
+ pkgdesc="A compatibility layer for running Windows programs - Staging branch"
+ url="http://www.wine-staging.com"
+@@ -108,7 +108,7 @@
+ 
+ prepare() {
+   # Allow ccache to work
+-  mv wine-patched-staging-$_pkgbasever $pkgname
++  mv wine-staging-$_pkgbasever $pkgname
+ 
+   sed 's|OpenCL/opencl.h|CL/opencl.h|g' -i $pkgname/configure*
+ 
+@@ -118,6 +118,12 @@
+ }
+ 
+ build() {
++
++  cpucount=$(( $(cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}') + 1 ))
++
++  echo "CPU count: $cpucount"
++  sleep 1
++
+   cd "$srcdir"
+ 
+   if [[ $CARCH == x86_64 ]]; then
+@@ -133,7 +139,7 @@
+       --enable-win64 \
+       --with-xattr
+ 
+-    make
++    make -j $cpucount
+ 
+     _wine32opts=(
+       --libdir=/usr/lib32
+@@ -152,7 +158,7 @@
+     --with-xattr \
+     "${_wine32opts[@]}"
+ 
+-  make
++  make -j $cpucount
+ }
+ 
+ package() {

@@ -34,6 +34,11 @@ patch "$WINE_SOURCES/configure.ac" < configure.patch
 
 dod "configure patch failed"
 
+cd $WINE_SOURCES
+autoreconf
+dod "failed to regenerate configure script"
+cd -
+
 # overwrites the build files
 
 cp -a dlls "$WINE_SOURCES"
