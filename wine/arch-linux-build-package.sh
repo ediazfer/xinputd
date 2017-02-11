@@ -19,8 +19,8 @@ doe getting PKGBUILD failed
 patch -p 1 < PKGBUILD.patch
 doe patch failed
 
-./wine-get
-doe failed to build archive
+./wine-staging-make-archive.sh
+doe failed to make archive
 
 makepkg -s
 

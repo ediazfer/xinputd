@@ -23,3 +23,12 @@ Given the organic nature of the pads input, mutexes are not so important.
 On the TODO list:
 _ change the protocol so clients use only read access to the shared memory
 
+How to easily make an archive
+=============================
+
+Easy wine-stating-2.1 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
+
+Easy wine-stating-2.1 Linux Arch package build : simply fetch wine/wine-staging-make-archive.sh wine/arch-linux-build-package.sh and PKGBUILD.patch and run wine/arch-linux-build-package.shs in a console. (Tested on Manjaro-OpenRC 64 bits.)
+
+Minor edition of the scripts may be required (ie: VERSION value)
+
