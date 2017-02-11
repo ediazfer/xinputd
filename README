@@ -23,8 +23,7 @@ Given the organic nature of the pads input, mutexes are not so important.
 On the TODO list:
 _ change the protocol so clients use only read access to the shared memory
 
-How to easily make an archive
-=============================
+How to easily make an wine-staging with xinputd support:
 
 Easy wine-staging-2.1 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
 
