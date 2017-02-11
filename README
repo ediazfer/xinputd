@@ -26,9 +26,15 @@ _ change the protocol so clients use only read access to the shared memory
 How to easily make an archive
 =============================
 
-Easy wine-stating-2.1 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
+Easy wine-staging-2.1 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
 
-Easy wine-stating-2.1 Linux Arch package build : simply fetch wine/wine-staging-make-archive.sh wine/arch-linux-build-package.sh and PKGBUILD.patch and run wine/arch-linux-build-package.shs in a console. (Tested on Manjaro-OpenRC 64 bits.)
+Easy wine-staging-2.1 Linux Arch package build : simply fetch wine/wine-staging-make-archive.sh wine/arch-linux-build-package.sh and PKGBUILD.patch and run wine/arch-linux-build-package.shs in a console. (Tested on Manjaro-OpenRC 64 bits.)
 
 Minor edition of the scripts may be required (ie: VERSION value)
+
+Easy access to the above files:
+
+wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/wine-staging-make-archive.sh
+wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/arch-linux-build-package.sh
+wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/PKGBUILD.patch
 
