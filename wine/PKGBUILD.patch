@@ -1,13 +1,13 @@
---- a/PKGBUILD	2017-02-26 19:56:57.000000000 +0100
-+++ b/PKGBUILD	2017-02-26 20:02:34.361048094 +0100
+--- a/PKGBUILD	2017-03-14 18:51:06.890515049 +0100
++++ b/PKGBUILD	2017-03-14 18:51:09.363885079 +0100
 @@ -11,10 +11,10 @@
  
  _pkgbasever=${pkgver/rc/-rc}
  
 -source=("https://github.com/wine-compholio/wine-patched/archive/staging-$_pkgbasever.tar.gz"
-+source=("wine-staging-2.2.tar.xz"
++source=("wine-staging-2.3.tar.xz"
          30-win32-aliases.conf)
--sha1sums=('b69507f19d1f543b52422d2fd34e0350e070423d'
+-sha1sums=('244f8531bc80b7e8697bc4585c880a5824bf1f67'
 -          '023a5c901c6a091c56e76b6a62d141d87cce9fdb')
 +sha1sums=(SKIP
 +          SKIP)
