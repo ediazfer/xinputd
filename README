@@ -30,5 +30,11 @@ Easy wine-staging-2.6 Linux Arch package build : fetch all the files in the xinp
 
 Minor edition of the scripts may be required (ie: VERSION value)
 
-If you have a lot of memory on your build machine, building in a ramdisk will be faster and spare your disk/ssd. (Just don't forget to recover the package before rebooting ;) )
+If you have a lot of memory on your build machine, building in a ramdisk will be faster and spare your disk/ssd. (Just don't forget to copy the package on permanent storage before rebooting ;) )
+
+ie:
+    mkdir /tmp/.ramdisk
+    sudo mount -t ramfs -o size=8192m ramfs /tmp/.ramdisk
+    chown $USER /tmp/.ramdisk
+    cd /tmp/.ramdisk
 
