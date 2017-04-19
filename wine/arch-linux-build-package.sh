@@ -1,5 +1,7 @@
 #!/bin/sh
 
+VERSION=2.6
+
 doe()
 {
     err=$?
@@ -18,6 +20,10 @@ doe getting PKGBUILD failed
 
 patch -p 1 < PKGBUILD.patch
 doe patch failed
+
+cat PKGBUILD |sed '/sha1sums/ {N;d;}'|sed 's/source=(.*/source=("wine-staging-2.6.tar.xz"/'|sed '/30-win32-aliases.conf)/ a sha1sums=(SKIP\n    SKIP)' | sed "s/^pkgver=.*/pkgver=$VERSION/"> PKGBUILD.tmp
+doe sed failed
+mv PKGBUILD.tmp PKGBUILD
 
 ./wine-staging-make-archive.sh
 doe failed to make archive

@@ -1,4 +1,4 @@
-This is an implementation of the xinput gamepad interface.
+wine/This is an implementation of the xinput gamepad interface.
 It works both in 32 and 64 bits.
 
 The state of the pads have to be shared through multiple applications
@@ -25,15 +25,10 @@ _ change the protocol so clients use only read access to the shared memory
 
 How to easily get a wine-staging with xinputd support:
 
-Easy wine-staging-2.3 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
-
-Easy wine-staging-2.3 Linux Arch package build : simply fetch wine/wine-staging-make-archive.sh wine/arch-linux-build-package.sh and PKGBUILD.patch and run wine/arch-linux-build-package.shs in a console. (Tested on Manjaro-OpenRC 64 bits.)
+Easy wine-staging-2.6 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
+Easy wine-staging-2.6 Linux Arch package build : fetch all the files in the xinputd/wine directory and run arch-linux-build-package.sh
 
 Minor edition of the scripts may be required (ie: VERSION value)
 
-Easy access to the above files:
-
-wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/wine-staging-make-archive.sh
-wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/arch-linux-build-package.sh
-wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/PKGBUILD.patch
+If you have a lot of memory on your build machine, building in a ramdisk will be faster and spare your disk/ssd. (Just don't forget to recover the package before rebooting ;) )
 
