@@ -31,7 +31,7 @@ then
 fi
 
 
-if [ -f $WINE_SOURCES/configure.patched ]
+if [ ! -f $WINE_SOURCES/configure.patched ]
 then
     echo "patching configure.ac"
 
