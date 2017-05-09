@@ -26,6 +26,7 @@ do
     if [ $? -ne 0 ]
     then
         echo $f not found in the path.
+        exit 1
     fi
 done
 
