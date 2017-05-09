@@ -25,9 +25,6 @@ _ change the protocol so clients use only read access to the shared memory
 
 How to easily get a wine-staging with xinputd support:
 
-Have wget installed.
-Have git installed.
-
 Easy wine-staging-2.7 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
 Easy wine-staging-2.7 Linux Arch package build : fetch wine/arch-linux-build-package.sh and run it in a console.
 
