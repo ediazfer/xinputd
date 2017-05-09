@@ -28,7 +28,7 @@ How to easily get a wine-staging with xinputd support:
 Easy wine-staging-2.7 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
 Easy wine-staging-2.7 Linux Arch package build : fetch all the files in the xinputd/wine directory and run arch-linux-build-package.sh
 
-Minor edition of the scripts may be required (ie: VERSION value)
+Minor edition of the scripts may be required to handle future wine releases (ie: VERSION value)
 
 If you have a lot of memory on your build machine, building in a ramdisk will be faster and spare your disk/ssd. (Just don't forget to copy the package on permanent storage before rebooting ;) )
 
