@@ -1,0 +1,19 @@
+MODULE    = xinput9_1_0.dll
+PARENTSRC = ../xinput1_3
+EXTRALIBS = $(PTHREAD_LIBS) $(SHM_LIBS) $(MQ_LIBS)
+
+C_SRCS = \
+	server.c \
+	debug.c \
+	xinput1_3_main.c \
+	tools.c \
+	xinput_gamepad.c \
+	xinput_service.c \
+	linux_input/xinput_linux_input_xboxpad_2.c \
+	linux_input/xinput_linux_input_generic.c \
+	linux_input/xinput_linux_input.c \
+	linux_input/xinput_linux_input_debug.c \
+	linux_input/xinput_linux_input_xboxpad.c \
+	linux_input/xinput_linux_input_translator.c
+
+RC_SRCS = version.rc
