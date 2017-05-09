@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=2.6
+VERSION=2.7
 
 WINE=wine-$VERSION.tar.xz
 WSTG=v$VERSION.tar.gz
@@ -87,6 +87,7 @@ then
 
         cd xinputd/wine
         doe xinputd/wine
+        echo "Running $(pwd)/patch-wine.sh $WINEDIR"
         ./patch-wine.sh $WINEDIR
         doe patch-wine
         cd ../..

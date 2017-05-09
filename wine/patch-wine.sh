@@ -30,9 +30,19 @@ then
     exit 2
 fi
 
-patch "$WINE_SOURCES/configure.ac" < configure.patch
 
-dod "configure patch failed"
+if [ -f $WINE_SOURCES/configure.patched ]
+then
+    echo "patching configure.ac"
+
+    patch "$WINE_SOURCES/configure.ac" < configure.patch
+
+    dod "configure patch failed"
+
+    touch $WINE_SOURCES/configure.patched
+fi
+
+echo "patching wine source at '$WINE_SOURCES'"
 
 cd $WINE_SOURCES
 autoreconf
@@ -40,6 +50,8 @@ dod "failed to regenerate configure script"
 cd -
 
 # overwrites the build files
+
+echo "writing xinputd files from '$(pwd)/dlls' in '$WINE_SOURCES'"
 
 cp -a dlls "$WINE_SOURCES"
 
