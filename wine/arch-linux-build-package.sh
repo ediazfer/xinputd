@@ -12,6 +12,22 @@ doe()
     fi
 }
 
+for f in wget sed chmod git cat patch cp autoreconf echo rm
+do
+    which $f > /dev/null 2>&1
+    if [ $? -ne 0 ]
+    then
+        echo $f not found in the path.
+    fi
+done
+
+for f in PKGBUILD.patch wine-staging-make-archive.sh
+do
+    wget https://raw.githubusercontent.com/ediazfer/xinputd/master/wine/$f
+done
+
+chmod +x wine-staging-make-archive.sh
+
 wget https://raw.githubusercontent.com/anish/archlinux/master/wine-silverlight/30-win32-aliases.conf
 doe getting 30-win32-aliases.conf failed
 

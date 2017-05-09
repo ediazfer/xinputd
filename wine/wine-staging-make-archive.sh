@@ -19,6 +19,16 @@ doe()
     fi
 }
 
+
+for f in wget sed chmod git cat patch cp autoreconf echo rm
+do
+    which $f > /dev/null 2>&1
+    if [ $? -ne 0 ]
+    then
+        echo $f not found in the path.
+    fi
+done
+
 # check the archive exists already
 
 if [ ! -f $WSARC ]
