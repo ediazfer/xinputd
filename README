@@ -25,8 +25,8 @@ _ change the protocol so clients use only read access to the shared memory
 
 How to easily get a wine-staging with xinputd support:
 
-Easy wine-staging-2.7 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
-Easy wine-staging-2.7 Linux Arch package build : fetch wine/arch-linux-build-package.sh and run it in a console.
+Easy wine-staging-2.10 archive creation : simply fetch wine/wine-staging-make-archive.sh and run it in a console.
+Easy wine-staging-2.10 Linux Arch package build : fetch wine/arch-linux-build-package.sh and run it in a console.
 
 Minor edition of the scripts may be required to handle future wine releases (ie: VERSION value)
 
@@ -35,6 +35,6 @@ If you have a lot of memory on your build machine, building in a ramdisk will be
 ie:
     mkdir /tmp/.ramdisk
     sudo mount -t ramfs -o size=8192m ramfs /tmp/.ramdisk
-    chown $USER /tmp/.ramdisk
+    sudo chown $USER /tmp/.ramdisk
     cd /tmp/.ramdisk
 

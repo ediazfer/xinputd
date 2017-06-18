@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=2.7
+VERSION=2.10
 
 WINE=wine-$VERSION.tar.xz
 WSTG=v$VERSION.tar.gz

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=2.7
+VERSION=2.10
 
 doe()
 {
@@ -38,7 +38,7 @@ doe getting PKGBUILD failed
 patch -p 1 < PKGBUILD.patch
 doe patch failed
 
-cat PKGBUILD |sed '/sha1sums/ {N;d;}'|sed "s/source=(.*/source=(\"wine-staging-$VERSION.tar.xz\"/"|sed '/30-win32-aliases.conf)/ a sha1sums=(SKIP\n    SKIP)' | sed "s/^pkgver=.*/pkgver=$VERSION/"> PKGBUILD.tmp
+cat PKGBUILD |sed '/sha1sums/ {N;d;}'|sed '/sha512sums/ {N;d;}'|sed "s/source=(.*/source=(\"wine-staging-$VERSION.tar.xz\"/"|sed '/30-win32-aliases.conf)/ a sha1sums=(SKIP\n    SKIP)\nsha256sums=(SKIP\n    SKIP)' | sed "s/^pkgver=.*/pkgver=$VERSION/"> PKGBUILD.tmp
 doe sed failed
 mv PKGBUILD.tmp PKGBUILD
 
