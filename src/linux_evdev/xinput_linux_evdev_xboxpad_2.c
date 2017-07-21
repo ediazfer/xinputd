@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 #include "xinput_settings.h"
 
 /*
- * As a driver, this is redundant with xinput_linux_input_xboxpad
+ * As a driver, this is redundant with xinput_linux_evdev_xboxpad
  * But this is an example of easy implementation that requires only
  * editing tables to implement the features of the joystick.
  * (Mind I only have 360/One pads for testing)
@@ -45,8 +45,8 @@
 #include <string.h>
 
 #include "xinput_gamepad.h"
-#include "xinput_linux_input.h"
-#include "xinput_linux_input_translator.h"
+#include "xinput_linux_evdev.h"
+#include "xinput_linux_evdev_translator.h"
 #include "tools.h"
 #include "device_id.h"
 
@@ -142,19 +142,19 @@ XINPUT_GAMEPAD_KEY_TRANSLATOR(xbox360_key_bis,
         XINPUT_GAMEPAD_DPAD_UP,
         XINPUT_GAMEPAD_DPAD_DOWN);
 
-static void xinput_linux_input_xboxpad2_input_event_to_gamepad(const struct input_event* ie, XINPUT_GAMEPAD_EX* gamepad)
+static void xinput_linux_evdev_xboxpad2_input_event_to_gamepad(const struct input_event* ie, XINPUT_GAMEPAD_EX* gamepad)
 {
     switch(ie->type)
     {
         case EV_KEY:
         {
-            xinput_linux_input_translator_key_input_event_to_gamepad(&xbox360_key, ie, gamepad);
-            xinput_linux_input_translator_key_input_event_to_gamepad(&xbox360_key_bis, ie, gamepad);
+            xinput_linux_evdev_translator_key_input_event_to_gamepad(&xbox360_key, ie, gamepad);
+            xinput_linux_evdev_translator_key_input_event_to_gamepad(&xbox360_key_bis, ie, gamepad);
             break;
         }
         case EV_ABS:
         {
-            xinput_linux_input_translator_abs_input_event_to_gamepad(&xbox360_abs, ie, gamepad);
+            xinput_linux_evdev_translator_abs_input_event_to_gamepad(&xbox360_abs, ie, gamepad);
             break;
         }
         default:
@@ -164,7 +164,7 @@ static void xinput_linux_input_xboxpad2_input_event_to_gamepad(const struct inpu
         }
     }
 }
-struct xinput_linux_input_xboxpad2_data
+struct xinput_linux_evdev_xboxpad2_data
 {
     XINPUT_GAMEPAD_EX gamepad;
     XINPUT_VIBRATION vibration;
@@ -172,24 +172,24 @@ struct xinput_linux_input_xboxpad2_data
     int effect_id;
 };
 
-typedef struct xinput_linux_input_xboxpad2_data xinput_linux_input_xboxpad2_data;
+typedef struct xinput_linux_evdev_xboxpad2_data xinput_linux_evdev_xboxpad2_data;
 
-static int xinput_linux_input_xboxpad2_read(struct xinput_gamepad_device* device)
+static int xinput_linux_evdev_xboxpad2_read(struct xinput_gamepad_device* device)
 {
-    xinput_linux_input_xboxpad2_data* data = (xinput_linux_input_xboxpad2_data*)device->data;
+    xinput_linux_evdev_xboxpad2_data* data = (xinput_linux_evdev_xboxpad2_data*)device->data;
     struct input_event ie;
-    int ret = xinput_linux_input_read_next(data->fd, &ie);
+    int ret = xinput_linux_evdev_read_next(data->fd, &ie);
     if(ret == 0)
     {
-        xinput_linux_input_xboxpad2_input_event_to_gamepad(&ie, &data->gamepad);
+        xinput_linux_evdev_xboxpad2_input_event_to_gamepad(&ie, &data->gamepad);
     }
 
     return ret;
 }
 
-static void xinput_linux_input_xboxpad2_update(struct xinput_gamepad_device* device, XINPUT_GAMEPAD_EX* gamepad, XINPUT_VIBRATION* vibration)
+static void xinput_linux_evdev_xboxpad2_update(struct xinput_gamepad_device* device, XINPUT_GAMEPAD_EX* gamepad, XINPUT_VIBRATION* vibration)
 {
-    xinput_linux_input_xboxpad2_data* data = (xinput_linux_input_xboxpad2_data*)device->data;
+    xinput_linux_evdev_xboxpad2_data* data = (xinput_linux_evdev_xboxpad2_data*)device->data;
 
     if(gamepad != NULL)
     {
@@ -201,11 +201,11 @@ static void xinput_linux_input_xboxpad2_update(struct xinput_gamepad_device* dev
     }
 }
 
-static int xinput_linux_input_xboxpad2_rumble(struct xinput_gamepad_device* device, const XINPUT_VIBRATION* vibration)
+static int xinput_linux_evdev_xboxpad2_rumble(struct xinput_gamepad_device* device, const XINPUT_VIBRATION* vibration)
 {
-    xinput_linux_input_xboxpad2_data* data = (xinput_linux_input_xboxpad2_data*)device->data;
+    xinput_linux_evdev_xboxpad2_data* data = (xinput_linux_evdev_xboxpad2_data*)device->data;
     int id;
-    id = xinput_linux_input_rumble(data->fd, data->effect_id, vibration->wLeftMotorSpeed, vibration->wRightMotorSpeed);
+    id = xinput_linux_evdev_rumble(data->fd, data->effect_id, vibration->wLeftMotorSpeed, vibration->wRightMotorSpeed);
     if(id >= 0)
     {
         data->effect_id = id;
@@ -214,13 +214,13 @@ static int xinput_linux_input_xboxpad2_rumble(struct xinput_gamepad_device* devi
     return 0;
 }
 
-static void xinput_linux_input_xboxpad2_release(struct xinput_gamepad_device* device)
+static void xinput_linux_evdev_xboxpad2_release(struct xinput_gamepad_device* device)
 {
-    xinput_linux_input_xboxpad2_data* data = (xinput_linux_input_xboxpad2_data*)device->data;
+    xinput_linux_evdev_xboxpad2_data* data = (xinput_linux_evdev_xboxpad2_data*)device->data;
 
     if(data->effect_id >= 0)
     {
-        xinput_linux_input_feedback_clear(data->fd, data->effect_id);
+        xinput_linux_evdev_feedback_clear(data->fd, data->effect_id);
         data->effect_id = -1;
     }
     close_ex(data->fd);
@@ -232,16 +232,16 @@ static void xinput_linux_input_xboxpad2_release(struct xinput_gamepad_device* de
 
 static const xinput_gamepad_device_vtbl xinput_xboxpad2_vtbl =
 {
-    &xinput_linux_input_xboxpad2_read,
-    &xinput_linux_input_xboxpad2_update,
-    &xinput_linux_input_xboxpad2_rumble,
-    &xinput_linux_input_xboxpad2_release
+    &xinput_linux_evdev_xboxpad2_read,
+    &xinput_linux_evdev_xboxpad2_update,
+    &xinput_linux_evdev_xboxpad2_rumble,
+    &xinput_linux_evdev_xboxpad2_release
 };
 
-static void xinput_linux_input_xboxpad2_init(struct xinput_gamepad_device* instance, int fd)
+static void xinput_linux_evdev_xboxpad2_init(struct xinput_gamepad_device* instance, int fd)
 {
-    xinput_linux_input_xboxpad2_data* data = (xinput_linux_input_xboxpad2_data*)malloc(sizeof(xinput_linux_input_xboxpad2_data));
-    memset(data, 0, sizeof(xinput_linux_input_xboxpad2_data));
+    xinput_linux_evdev_xboxpad2_data* data = (xinput_linux_evdev_xboxpad2_data*)malloc(sizeof(xinput_linux_evdev_xboxpad2_data));
+    memset(data, 0, sizeof(xinput_linux_evdev_xboxpad2_data));
     data->fd = fd;
     data->effect_id = -1;
     instance->data = data;
@@ -251,19 +251,19 @@ static void xinput_linux_input_xboxpad2_init(struct xinput_gamepad_device* insta
 static struct xinput_driver_supported_device xboxpad_factories[] =
 {
     {
-        "XBox360 Controller", xinput_linux_input_xboxpad2_init,
+        "XBox360 Controller", xinput_linux_evdev_xboxpad2_init,
         MANUFACTURER_MICROSOFT, XBOX360_CONTROLLER
     },
     {
-        "XBox360 Wireless Controller", xinput_linux_input_xboxpad2_init,
+        "XBox360 Wireless Controller", xinput_linux_evdev_xboxpad2_init,
         MANUFACTURER_MICROSOFT, XBOX360_WIRELESS_CONTROLLER
     },
     {
-        "XBoxOne Controller", xinput_linux_input_xboxpad2_init,
+        "XBoxOne Controller", xinput_linux_evdev_xboxpad2_init,
         MANUFACTURER_MICROSOFT, XBOXONE_CONTROLLER
     },
     {
-        "XBoxOne Wireless Controller", xinput_linux_input_xboxpad2_init,
+        "XBoxOne Wireless Controller", xinput_linux_evdev_xboxpad2_init,
         MANUFACTURER_MICROSOFT, XBOXONE_WIRELESS_CONTROLLER
     },
     {
@@ -271,7 +271,7 @@ static struct xinput_driver_supported_device xboxpad_factories[] =
     }
 };
 
-BOOL xinput_linux_input_xboxpad2_can_translate(const struct xinput_linux_input_probe_s* probed)
+BOOL xinput_linux_evdev_xboxpad2_can_translate(const struct xinput_linux_evdev_probe_s* probed)
 {
     for(int i = 0; xboxpad_factories[i].vendor != 0; ++i)
     {
@@ -285,7 +285,7 @@ BOOL xinput_linux_input_xboxpad2_can_translate(const struct xinput_linux_input_p
     return FALSE;
 }
 
-BOOL xinput_linux_input_xboxpad2_new_instance(const struct xinput_linux_input_probe_s* probed, int fd, xinput_gamepad_device* instance)
+BOOL xinput_linux_evdev_xboxpad2_new_instance(const struct xinput_linux_evdev_probe_s* probed, int fd, xinput_gamepad_device* instance)
 {
     for(int i = 0; i < 4; ++i)
     {

@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,48 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-#ifndef XINPUT_LINUX_INPUT_XBOXPAD_2_H
-#define XINPUT_LINUX_INPUT_XBOXPAD_2_H
+#ifndef XINPUT_LINUX_EVDEV_DEBUG_H
+#define XINPUT_LINUX_EVDEV_DEBUG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * As a driver, this is redundant with xinput_linux_input_xboxpad
- * But this is an example of easy implementation that requires only
- * editing tables to implement the features of the joystick.
- * (Mind I only have 360/One pads for testing)
- *
- * The next driver I'll write is one that generates the same tables
- * to make do with whatever buttons/axis are found on an unknown joystick.
- *
- */
-
-/**
- * Tells if this driver can handle that input_id.
- *
- * @param id
- * @return
- */
-
-BOOL xinput_linux_input_xboxpad2_can_translate(const struct input_id* id);
-
-/**
- * Initialises an instance of driver
- *
- * @param id
- * @param fd
- * @param instance
- * @return
- */
-
-BOOL xinput_linux_input_xboxpad2_new_instance(const struct input_id* id, int fd, xinput_gamepad_device* instance);
+const char* xinput_linux_evdev_event_type_get_name(int idx);
+const char* xinput_linux_evdev_key_get_name(int idx);
+const char* xinput_linux_evdev_abs_get_name(int idx);
+const char* xinput_linux_evdev_ff_get_name(int idx);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* XINPUT_LINUX_INPUT_XBOXPAD_2_H */
+#endif /* XINPUT_LINUX_EVDEV_DEBUG_H */
 

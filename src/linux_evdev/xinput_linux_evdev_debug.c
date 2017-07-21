@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ static const char* EVENT_TYPES_STR[] =
     "FF_STATUS",    /*  0x17 */
 };
 
-const char* xinput_linux_input_event_type_get_name(int idx)
+const char* xinput_linux_evdev_event_type_get_name(int idx)
 {
     if(idx >= EV_SYN && idx <= EV_FF_STATUS)
     {
@@ -141,7 +141,7 @@ static const char* KEY_NAMES_STR[] =
     "0x13f"         /*  0x13f */
 };
 
-const char* xinput_linux_input_key_get_name(int idx)
+const char* xinput_linux_evdev_key_get_name(int idx)
 {
     if(idx >= BTN_MISC && idx <= BTN_DIGI)
     {
@@ -219,7 +219,7 @@ static const char* ABS_NAMES_STR[] =
     "ABS_MT_TOOL_Y"          /* 0x3d     Center Y tool position */
 };
 
-const char* xinput_linux_input_abs_get_name(int idx)
+const char* xinput_linux_evdev_abs_get_name(int idx)
 {
     if(idx >= ABS_X && idx <= ABS_MT_TOOL_Y)
     {
@@ -254,7 +254,7 @@ static const char* FF_NAMES_STR[] = /* [ 0x50: 0x61 ] */
     "FF_AUTOCENTER"
 };
 
-const char* xinput_linux_input_ff_get_name(int idx)
+const char* xinput_linux_evdev_ff_get_name(int idx)
 {
     if(idx >= FF_RUMBLE && idx <= FF_AUTOCENTER)
     {

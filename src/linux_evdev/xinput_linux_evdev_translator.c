@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,11 @@
 #include "tools.h"
 #include "debug.h"
 
-#include "xinput_linux_input_translator.h"
+#include "xinput_linux_evdev_translator.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(xinput);
 
-void xinput_linux_input_translator_abs_translate_nothing(const struct xinput_linux_input_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
+void xinput_linux_evdev_translator_abs_translate_nothing(const struct xinput_linux_evdev_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
 {
     (void)item;
     (void)gamepad;
@@ -50,7 +50,7 @@ void xinput_linux_input_translator_abs_translate_nothing(const struct xinput_lin
     FIXME("ABS input not supported\n");
 }
 
-void xinput_linux_input_translator_abs_translate_to_axis(const struct xinput_linux_input_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
+void xinput_linux_evdev_translator_abs_translate_to_axis(const struct xinput_linux_evdev_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
 {
     SHORT* p;
     char* base = (char*)gamepad;
@@ -59,7 +59,7 @@ void xinput_linux_input_translator_abs_translate_to_axis(const struct xinput_lin
     *p = value;
 }
 
-void xinput_linux_input_translator_abs_translate_to_axis_reverse(const struct xinput_linux_input_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
+void xinput_linux_evdev_translator_abs_translate_to_axis_reverse(const struct xinput_linux_evdev_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
 {
     SHORT* p;
     char* base = (char*)gamepad;
@@ -68,7 +68,7 @@ void xinput_linux_input_translator_abs_translate_to_axis_reverse(const struct xi
     *p = ~value;
 }
 
-void xinput_linux_input_translator_abs_translate_to_buttons(const struct xinput_linux_input_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
+void xinput_linux_evdev_translator_abs_translate_to_buttons(const struct xinput_linux_evdev_translator_abs_translator_item* item, XINPUT_GAMEPAD_EX* gamepad, int16_t value)
 {
     if(value > 0)
     {
@@ -85,14 +85,14 @@ void xinput_linux_input_translator_abs_translate_to_buttons(const struct xinput_
 }
 
 void
-xinput_linux_input_translator_abs_input_event_to_gamepad(const struct xinput_linux_input_translator_abs_translator* translator, const struct input_event* ie, XINPUT_GAMEPAD_EX* gamepad)
+xinput_linux_evdev_translator_abs_input_event_to_gamepad(const struct xinput_linux_evdev_translator_abs_translator* translator, const struct input_event* ie, XINPUT_GAMEPAD_EX* gamepad)
 {
-    const struct xinput_linux_input_translator_abs_translator_item* line = &translator->_item[ie->code];
+    const struct xinput_linux_evdev_translator_abs_translator_item* line = &translator->_item[ie->code];
     line->translate(line, gamepad, ie->value);
 }
 
 void
-xinput_linux_input_translator_key_input_event_to_gamepad(const struct xinput_linux_input_translator_key_translator* translator, const struct input_event* ie, XINPUT_GAMEPAD_EX* gamepad)
+xinput_linux_evdev_translator_key_input_event_to_gamepad(const struct xinput_linux_evdev_translator_key_translator* translator, const struct input_event* ie, XINPUT_GAMEPAD_EX* gamepad)
 {
     if(ie->code >= translator->_first && ie->code <= translator->_last)
     {
@@ -108,25 +108,25 @@ xinput_linux_input_translator_key_input_event_to_gamepad(const struct xinput_lin
     }
 }
 
-void xinput_gamepad_abs_set_axis(struct xinput_linux_input_translator_abs_translator *abs, int bit, ssize_t offs)
+void xinput_gamepad_abs_set_axis(struct xinput_linux_evdev_translator_abs_translator *abs, int bit, ssize_t offs)
 {
-    abs->_item[bit].translate = &xinput_linux_input_translator_abs_translate_to_axis;
+    abs->_item[bit].translate = &xinput_linux_evdev_translator_abs_translate_to_axis;
     abs->_item[bit].to = offs;
     abs->_item[bit].positive = 0;
     abs->_item[bit].negative = 0;
 }
 
-void xinput_gamepad_abs_set_sixa(struct xinput_linux_input_translator_abs_translator *abs, int bit, ssize_t offs)
+void xinput_gamepad_abs_set_sixa(struct xinput_linux_evdev_translator_abs_translator *abs, int bit, ssize_t offs)
 {
-    abs->_item[bit].translate = &xinput_linux_input_translator_abs_translate_to_axis_reverse;
+    abs->_item[bit].translate = &xinput_linux_evdev_translator_abs_translate_to_axis_reverse;
     abs->_item[bit].to = offs;
     abs->_item[bit].positive = 0;
     abs->_item[bit].negative = 0;
 }
 
-void xinput_gamepad_abs_set_bttn(struct xinput_linux_input_translator_abs_translator *abs, int bit, int16_t pos, int16_t neg)
+void xinput_gamepad_abs_set_bttn(struct xinput_linux_evdev_translator_abs_translator *abs, int bit, int16_t pos, int16_t neg)
 {
-    abs->_item[bit].translate = &xinput_linux_input_translator_abs_translate_to_buttons;
+    abs->_item[bit].translate = &xinput_linux_evdev_translator_abs_translate_to_buttons;
     abs->_item[bit].to = 0;
     abs->_item[bit].positive = pos;
     abs->_item[bit].negative = neg;

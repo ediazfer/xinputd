@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,12 +45,12 @@
 #include "xinput.h"
 #include "tools.h"
 #include "debug.h"
-#include "xinput_linux_input_debug.h"
+#include "xinput_linux_evdev_debug.h"
 
-#include "xinput_linux_input_generic.h"
-#include "xinput_linux_input_translator.h"
+#include "xinput_linux_evdev_generic.h"
+#include "xinput_linux_evdev_translator.h"
 
-#include "xinput_linux_input.h"
+#include "xinput_linux_evdev.h"
 #include "device_id.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(xinput);
@@ -91,24 +91,24 @@ static int xinput_gamepad_generic_translation[20][2] =
     { 0, 0}
 };
 
-struct xinput_linux_input_generic_data
+struct xinput_linux_evdev_generic_data
 {
-    struct xinput_linux_input_translator_abs_translator abs;    
+    struct xinput_linux_evdev_translator_abs_translator abs;    
     SHORT key_buttons[KEY_CNT];
-    struct xinput_linux_input_translator_key_translator key;
+    struct xinput_linux_evdev_translator_key_translator key;
     XINPUT_GAMEPAD_EX gamepad;
     XINPUT_VIBRATION vibration;
     int fd;
     int effect_id;
 };
 
-typedef struct xinput_linux_input_generic_data xinput_linux_input_generic_data;
+typedef struct xinput_linux_evdev_generic_data xinput_linux_evdev_generic_data;
 
-static int xinput_linux_input_generic_read(struct xinput_gamepad_device* device)
+static int xinput_linux_evdev_generic_read(struct xinput_gamepad_device* device)
 {
-    xinput_linux_input_generic_data* data = (xinput_linux_input_generic_data*)device->data;
+    xinput_linux_evdev_generic_data* data = (xinput_linux_evdev_generic_data*)device->data;
     struct input_event ie;
-    int ret = xinput_linux_input_read_next(data->fd, &ie);
+    int ret = xinput_linux_evdev_read_next(data->fd, &ie);
     if(ret == 0)
     {
         switch(ie.type)
@@ -117,12 +117,12 @@ static int xinput_linux_input_generic_read(struct xinput_gamepad_device* device)
             {
 #if DEBUG_EVENTS
                 TRACE("EVENT %04hx=%s %04hx=%s %08x\n",
-                        ie->type, xinput_linux_input_event_type_get_name(ie->type),
-                        ie->code, xinput_linux_input_key_get_name(ie->code),
+                        ie->type, xinput_linux_evdev_event_type_get_name(ie->type),
+                        ie->code, xinput_linux_evdev_key_get_name(ie->code),
                         ie->value
                         );
 #endif
-                xinput_linux_input_translator_key_input_event_to_gamepad(&data->key, &ie, &data->gamepad);
+                xinput_linux_evdev_translator_key_input_event_to_gamepad(&data->key, &ie, &data->gamepad);
 
                 break;
             }
@@ -130,12 +130,12 @@ static int xinput_linux_input_generic_read(struct xinput_gamepad_device* device)
             {
 #if DEBUG_EVENTS
                 TRACE("EVENT %04hx=%s %04hx=%s %08x\n",
-                        ie->type, xinput_linux_input_event_type_get_name(ie->type),
-                        ie->code, xinput_linux_input_abs_get_name(ie->code),
+                        ie->type, xinput_linux_evdev_event_type_get_name(ie->type),
+                        ie->code, xinput_linux_evdev_abs_get_name(ie->code),
                         ie->value
                         );
 #endif
-                xinput_linux_input_translator_abs_input_event_to_gamepad(&data->abs, &ie, &data->gamepad);
+                xinput_linux_evdev_translator_abs_input_event_to_gamepad(&data->abs, &ie, &data->gamepad);
 
                 break;
             }
@@ -151,7 +151,7 @@ static int xinput_linux_input_generic_read(struct xinput_gamepad_device* device)
             {
 #if DEBUG_EVENTS
                 TRACE("EVENT %04hx=%s %04hx %08x\n",
-                        ie->type, xinput_linux_input_event_type_get_name(ie->type),
+                        ie->type, xinput_linux_evdev_event_type_get_name(ie->type),
                         ie->code,
                         ie->value
                         );
@@ -165,9 +165,9 @@ static int xinput_linux_input_generic_read(struct xinput_gamepad_device* device)
     return ret;
 }
 
-static void xinput_linux_input_generic_update(struct xinput_gamepad_device* device, XINPUT_GAMEPAD_EX* gamepad, XINPUT_VIBRATION* vibration)
+static void xinput_linux_evdev_generic_update(struct xinput_gamepad_device* device, XINPUT_GAMEPAD_EX* gamepad, XINPUT_VIBRATION* vibration)
 {
-    xinput_linux_input_generic_data* data = (xinput_linux_input_generic_data*)device->data;
+    xinput_linux_evdev_generic_data* data = (xinput_linux_evdev_generic_data*)device->data;
 
     if(gamepad != NULL)
     {
@@ -179,11 +179,11 @@ static void xinput_linux_input_generic_update(struct xinput_gamepad_device* devi
     }
 }
 
-static int xinput_linux_input_generic_rumble(struct xinput_gamepad_device* device, const XINPUT_VIBRATION* vibration)
+static int xinput_linux_evdev_generic_rumble(struct xinput_gamepad_device* device, const XINPUT_VIBRATION* vibration)
 {
-    xinput_linux_input_generic_data* data = (xinput_linux_input_generic_data*)device->data;
+    xinput_linux_evdev_generic_data* data = (xinput_linux_evdev_generic_data*)device->data;
     int id;
-    id = xinput_linux_input_rumble(data->fd, data->effect_id, vibration->wLeftMotorSpeed, vibration->wRightMotorSpeed);
+    id = xinput_linux_evdev_rumble(data->fd, data->effect_id, vibration->wLeftMotorSpeed, vibration->wRightMotorSpeed);
     if(id >= 0)
     {
         data->effect_id = id;
@@ -192,15 +192,15 @@ static int xinput_linux_input_generic_rumble(struct xinput_gamepad_device* devic
     return 0;
 }
 
-static void xinput_linux_input_generic_release(struct xinput_gamepad_device* device)
+static void xinput_linux_evdev_generic_release(struct xinput_gamepad_device* device)
 {
-    xinput_linux_input_generic_data* data = (xinput_linux_input_generic_data*)device->data;
+    xinput_linux_evdev_generic_data* data = (xinput_linux_evdev_generic_data*)device->data;
     
     TRACE("release %p", device);
 
     if(data->effect_id >= 0)
     {
-        xinput_linux_input_feedback_clear(data->fd, data->effect_id);
+        xinput_linux_evdev_feedback_clear(data->fd, data->effect_id);
         data->effect_id = -1;
     }
 
@@ -213,28 +213,28 @@ static void xinput_linux_input_generic_release(struct xinput_gamepad_device* dev
 
 static const xinput_gamepad_device_vtbl xinput_xboxpad_vtbl =
 {
-    &xinput_linux_input_generic_read,
-    &xinput_linux_input_generic_update,
-    &xinput_linux_input_generic_rumble,
-    &xinput_linux_input_generic_release
+    &xinput_linux_evdev_generic_read,
+    &xinput_linux_evdev_generic_update,
+    &xinput_linux_evdev_generic_rumble,
+    &xinput_linux_evdev_generic_release
 };
 
-static void xinput_linux_input_generic_init(struct xinput_gamepad_device* device, int fd)
+static void xinput_linux_evdev_generic_init(struct xinput_gamepad_device* device, int fd)
 {
-    xinput_linux_input_generic_data* data = (xinput_linux_input_generic_data*)malloc(sizeof(xinput_linux_input_generic_data));
+    xinput_linux_evdev_generic_data* data = (xinput_linux_evdev_generic_data*)malloc(sizeof(xinput_linux_evdev_generic_data));
     
     TRACE("init %p with fd %i", device, fd);
     
-    memset(data, 0, sizeof(xinput_linux_input_generic_data));
+    memset(data, 0, sizeof(xinput_linux_evdev_generic_data));
     data->fd = fd;
     data->effect_id = -1;
     device->data = data;
     device->vtbl = &xinput_xboxpad_vtbl;
 }
 
-static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input_probe_s* probedp, xinput_linux_input_generic_data *data)
+static BOOL xinput_linux_evdev_generic_translate(const struct xinput_linux_evdev_probe_s* probedp, xinput_linux_evdev_generic_data *data)
 {
-    struct xinput_linux_input_translator_abs_translator *abs;
+    struct xinput_linux_evdev_translator_abs_translator *abs;
     SHORT *key_buttons;
     SHORT local_key_buttons[KEY_CNT];
     WORD buttons = XINPUT_GAMEPAD_RESERVED0;
@@ -242,7 +242,7 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
     BYTE axis = 0;  // TLX, TLY, TRX, TRY, TL, TR : 1 -> 32
     uint8_t ev_key[KEY_CNT>>3];
     uint8_t ev_abs[ABS_CNT>>3];
-    struct xinput_linux_input_translator_abs_translator local_abs;
+    struct xinput_linux_evdev_translator_abs_translator local_abs;
 
     memcpy(ev_key, probedp->ev_key, sizeof(ev_key));
     memcpy(ev_abs, probedp->ev_abs, sizeof(ev_abs));
@@ -320,8 +320,7 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
     
     // specific analogic to button translation
     
-    if((buttons & (XINPUT_GAMEPAD_DPAD_RIGHT|XINPUT_GAMEPAD_DPAD_LEFT|XINPUT_GAMEPAD_DPAD_DOWN|XINPUT_GAMEPAD_DPAD_UP)) ==
-            (XINPUT_GAMEPAD_DPAD_RIGHT|XINPUT_GAMEPAD_DPAD_LEFT|XINPUT_GAMEPAD_DPAD_DOWN|XINPUT_GAMEPAD_DPAD_UP))
+    if((buttons & (XINPUT_GAMEPAD_DPAD_RIGHT|XINPUT_GAMEPAD_DPAD_LEFT|XINPUT_GAMEPAD_DPAD_DOWN|XINPUT_GAMEPAD_DPAD_UP)) == 0)
     {
         if(bit_get(ev_abs, ABS_HAT0X) && bit_get(ev_abs, ABS_HAT0Y))
         {
@@ -361,7 +360,7 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
     // now my on a first-come first-serve
     
     {
-        static const SHORT BUTTONS_ALL_MASK = (SHORT)~0;
+        static const WORD BUTTONS_ALL_MASK = (WORD)~0;
         int pad = 1;
         for(int btn_index = 0; (buttons != BUTTONS_ALL_MASK) && (btn_index < KEY_CNT); ++btn_index)
         {
@@ -425,20 +424,22 @@ static BOOL xinput_linux_input_generic_translate(const struct xinput_linux_input
         }
     }
     
+    
+    
     return (buttons == BUTTONS_ALL) && (axis == ABS_ALL);
 }
 
-BOOL xinput_linux_input_generic_can_translate(const struct xinput_linux_input_probe_s* probed)
+BOOL xinput_linux_evdev_generic_can_translate(const struct xinput_linux_evdev_probe_s* probed)
 {
-    return xinput_linux_input_generic_translate(probed, NULL);
+    return xinput_linux_evdev_generic_translate(probed, NULL);
 }
 
-BOOL xinput_linux_input_generic_new_instance(const struct xinput_linux_input_probe_s* probed, int fd, xinput_gamepad_device* instance)
+BOOL xinput_linux_evdev_generic_new_instance(const struct xinput_linux_evdev_probe_s* probed, int fd, xinput_gamepad_device* instance)
 {
-    xinput_linux_input_generic_data *data = (xinput_linux_input_generic_data*)malloc(sizeof(xinput_linux_input_generic_data));
+    xinput_linux_evdev_generic_data *data = (xinput_linux_evdev_generic_data*)malloc(sizeof(xinput_linux_evdev_generic_data));
     BOOL ret;
-    memset(data, 0, sizeof(xinput_linux_input_generic_data));
-    ret = xinput_linux_input_generic_translate(probed, data);
+    memset(data, 0, sizeof(xinput_linux_evdev_generic_data));
+    ret = xinput_linux_evdev_generic_translate(probed, data);
     if(ret)
     {
         data->fd = fd;

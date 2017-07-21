@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@
  * SOFTWARE.
  */
 
-#ifndef XINPUT_LINUX_INPUT_H
-#define XINPUT_LINUX_INPUT_H
+#ifndef XINPUT_LINUX_JOYSTICK_H
+#define XINPUT_LINUX_JOYSTICK_H
 
 #include <stdint.h>
 #include "xinput_gamepad.h"
@@ -35,20 +35,8 @@
 extern "C" {
 #endif
 
-struct xinput_linux_input_probe_s
+struct xinput_linux_joystick_probe_s
 {
-    struct input_id id;
-    int version;
-    int abs_count;
-    int key_count;
-    int ff_count;
-    uint8_t prop[INPUT_PROP_MAX];
-    uint8_t ev_all[EV_CNT>>3];
-    uint8_t ev_key[KEY_CNT>>3];
-    uint8_t ev_abs[ABS_CNT>>3];
-    uint8_t ev_ff[FF_CNT>>3];
-    char device_name[128];
-    char location[128];  
 };
     
 /**
@@ -56,7 +44,7 @@ struct xinput_linux_input_probe_s
  *
  */
 
-void xinput_linux_input_initialize(void);
+void xinput_linux_joystick_initialize(void);
 
 /**
  * Probes for new devices.
@@ -64,7 +52,7 @@ void xinput_linux_input_initialize(void);
  * @return a bitmask of the newly found devices
  */
 
-uint32_t xinput_linux_input_probe(void);
+uint32_t xinput_linux_joystick_probe(void);
 
 /**
  * Returns the device in the specified slot
@@ -73,7 +61,7 @@ uint32_t xinput_linux_input_probe(void);
  * @return
  */
 
-xinput_gamepad_device* xinput_linux_input_get_device(int slot);
+xinput_gamepad_device* xinput_linux_joystick_get_device(int slot);
 
 /**
  * Closes the device in the specified slot
@@ -81,14 +69,14 @@ xinput_gamepad_device* xinput_linux_input_get_device(int slot);
  * @param slot
  */
 
-void xinput_linux_input_device_close(int slot);
+void xinput_linux_joystick_device_close(int slot);
 
 /**
  * Cleans-up the linux input
  *
  */
 
-void xinput_linux_input_finalize(void);
+void xinput_linux_joystick_finalize(void);
 
 /**
  * If multiple driver support is implemented, this will be replaced
@@ -96,35 +84,14 @@ void xinput_linux_input_finalize(void);
  * Until then, this basic mapping will do.
  */
 
-#define xinput_driver_initialize xinput_linux_input_initialize
-#define xinput_driver_probe xinput_linux_input_probe
-#define xinput_driver_get_device xinput_linux_input_get_device
-#define xinput_driver_device_close xinput_linux_input_device_close
-#define xinput_driver_finalize xinput_linux_input_finalize
-
-struct input_event;
-
-int xinput_linux_input_read_next(int fd, struct input_event* ie);
-
-/**
- * The left motor is supposed to be low frequency, high magnitude
- * The right motor is supposed to be high frequency, weak magnitude
- *
- * @param fd
- * @param id the current effect id, or -1
- * @param low
- * @param high
- *
- * @return the id of the effect or -1 if it failed to register the effect
- */
-
-int xinput_linux_input_rumble(int fd, int id, SHORT low_left, SHORT high_right);
-
-void xinput_linux_input_feedback_clear(int fd, int id);
+#define xinput_driver_initialize xinput_linux_joystick_initialize
+#define xinput_driver_probe xinput_linux_joystick_probe
+#define xinput_driver_get_device xinput_linux_joystick_get_device
+#define xinput_driver_device_close xinput_linux_joystick_device_close
+#define xinput_driver_finalize xinput_linux_joystick_finalize
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* XINPUT_LINUX_INPUT_H */
-
+#endif /* XINPUT_LINUX_EVDEV_H */

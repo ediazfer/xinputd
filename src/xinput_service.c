@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@
 
 
 #if HAVE_LINUX_INPUT_H
-#include "linux_input/xinput_linux_input.h"
+#include "linux_evdev/xinput_linux_evdev.h"
 #else
 /* no supported driver */
 #define xinput_driver_initialize()
@@ -206,7 +206,7 @@ static void* xinput_service_rumble_thread(void* args_)
          * send rumble
          */
 
-        if((device = xinput_linux_input_get_device(vibration_message.index)) != NULL)
+        if((device = xinput_linux_evdev_get_device(vibration_message.index)) != NULL)
         {
             device->vtbl->rumble(device, &vibration_message.vibration);
         }

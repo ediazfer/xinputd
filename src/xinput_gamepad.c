@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -194,7 +194,7 @@ static int xinput_gamepad_service_is_alive(void)
     {
         client_shared->poke_us = timeus();
         
-        TRACE("alive (self)\n");
+        //TRACE("alive (self)\n");
         return 0;
     }
 #endif
@@ -202,6 +202,11 @@ static int xinput_gamepad_service_is_alive(void)
     /*  wait until the pid is set, or assumed to be broken */
 
     TRACE("fetching master pid, shared@%p\n", client_shared);
+    
+    if(client_shared == NULL)
+    {
+        return 0;
+    }
 
     /* give 5 tries to get the master */
 

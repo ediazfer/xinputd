@@ -3,7 +3,7 @@
  *
  * Unix XInput Gamepad interface implementation
  *
- * Copyright (c) 2016 Eric Diaz Fernandez
+ * Copyright (c) 2016-2017 Eric Diaz Fernandez
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef XINPUT_LINUX_INPUT_DEBUG_H
-#define XINPUT_LINUX_INPUT_DEBUG_H
+
+#ifndef XINPUT_LINUX_EVDEV_XBOXPAD_H
+#define XINPUT_LINUX_EVDEV_XBOXPAD_H
+
+#include "xinput_gamepad.h"
+#include "xinput_linux_evdev.h"
+#include <linux/input.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+/**
+ * Tells if this driver can handle that input_id.
+ *
+ * @param id
+ * @return
+ */
 
-const char* xinput_linux_input_event_type_get_name(int idx);
-const char* xinput_linux_input_key_get_name(int idx);
-const char* xinput_linux_input_abs_get_name(int idx);
-const char* xinput_linux_input_ff_get_name(int idx);
+BOOL xinput_linux_evdev_xboxpad_can_translate(const struct xinput_linux_evdev_probe_s* probed);
+
+/**
+ * Initialises an instance of driver
+ *
+ * @param id
+ * @param fd
+ * @param instance
+ * @return
+ */
+
+BOOL xinput_linux_evdev_xboxpad_new_instance(const struct xinput_linux_evdev_probe_s* probed, int fd, xinput_gamepad_device* instance);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* XINPUT_LINUX_INPUT_DEBUG_H */
+#endif /* XINPUT_LINUX_EVDEV_XBOXPAD_H */
 
