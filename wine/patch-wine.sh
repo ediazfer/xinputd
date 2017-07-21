@@ -59,11 +59,11 @@ dod "failed to copy dll build files"
 
 dlldir="$WINE_SOURCES/dlls/xinput1_3"
 
-mkdir -p "$dlldir/linux_input"
+mkdir -p "$dlldir/linux_evdev"
 
-dod "could not create '$dlldir/linux_input'"
+dod "could not create '$dlldir/linux_evdev'"
 
-cp ../src/linux_input/*.{c,h} "$dlldir/linux_input"
+cp ../src/linux_evdev/*.{c,h} "$dlldir/linux_evdev"
 
 dod "could not copy linux-specific source files to '$dlldir'"
 
