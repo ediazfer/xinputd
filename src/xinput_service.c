@@ -620,7 +620,7 @@ int xinput_service_poke(void)
         state = NULL;
 
         close_ex(fd);
-        fd = -1;
+        // fd = -1;
 
         /*  create a new server */
 
@@ -767,44 +767,90 @@ BOOL xinput_service_self(void)
     return service_shared != NULL;
 }
 
-static BOOL xinput_service_acquire_lock(void)
+static int xinput_service_lock_fd = -1;
+static pthread_mutex_t xinput_service_lock_fd_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+static BOOL xinput_service_lock_acquire(void)
 {
+    int fd;
     int ret;
 
     TRACE("system-wide exclusive lock\n");
-
-    ret = open(XINPUT_SYSTEM_WIDE_LOCK_FILE, O_CREAT|O_RDWR|O_TRUNC, 0666);
-    if(ret >= 0)
+    
+    pthread_mutex_lock(&xinput_service_lock_fd_mtx);
+    if(xinput_service_lock_fd >= 0)
+    {
+        pthread_mutex_unlock(&xinput_service_lock_fd_mtx);
+        TRACE("system-wide exclusive lock acquired already\n");
+        return TRUE;
+    }
+    pthread_mutex_unlock(&xinput_service_lock_fd_mtx);
+    
+    fd = open(XINPUT_SYSTEM_WIDE_LOCK_FILE, O_CREAT|O_RDWR|O_TRUNC, 0666);
+    
+    if(fd >= 0)
     {
         TRACE("system-wide lock file opened\n");
 
-        if(flock(ret, LOCK_EX|LOCK_NB) >= 0)
+        for(;;)
         {
-            TRACE("system-wide lock acquired\n");
-            return TRUE;
-        }
-        else
-        {
-            close_ex(ret);
+            if(flock(fd, LOCK_EX|LOCK_NB) >= 0)
+            {
+                TRACE("system-wide lock acquired\n");
+                
+                xinput_service_lock_fd = fd;
+                
+                return TRUE;
+            }
+            else
+            {
+                ret = errno;
+                
+                if(ret != EINTR)
+                {
+                    close_ex(fd);
 
-            ret = errno;
-            TRACE("system-wide lock failed: %s\n", strerror(ret));
+                    TRACE("system-wide lock failed: %s\n", strerror(ret));
+                    
+                    break;
+                }
+            }
         }
     }
     else
     {
         ret = errno;
-        TRACE("system-wide lock file cannot be opened: %s\n", strerror(ret));
+        TRACE("system-wide lock file '%s' cannot be opened: %s\n", XINPUT_SYSTEM_WIDE_LOCK_FILE, strerror(ret));
     }
+    
     return FALSE;
+}
+
+static BOOL xinput_service_lock_release(void)
+{
+    pthread_mutex_lock(&xinput_service_lock_fd_mtx);
+    if(xinput_service_lock_fd >= 0)
+    {
+        int fd = xinput_service_lock_fd;
+        xinput_service_lock_fd = -1;
+        TRACE("system-wide exclusive lock released\n");
+        pthread_mutex_unlock(&xinput_service_lock_fd_mtx);
+        close_ex(fd);
+    }
+    else
+    {
+        TRACE("system-wide exclusive lock released already\n");
+        pthread_mutex_unlock(&xinput_service_lock_fd_mtx);
+    }
 }
 
 void xinput_service_server(void)
 {
     int ret;
 
-    if(!xinput_service_acquire_lock())
+    if(!xinput_service_lock_acquire())
     {
+        TRACE("failed to acquire lock");
         return;
     }
 
@@ -836,6 +882,9 @@ void xinput_service_server(void)
     }
 
     xinput_service_destroy();
+    
+    xinput_service_lock_release();
+    
     TRACE("stopping\n");
 }
 
@@ -844,6 +893,7 @@ static void* xinput_service_server_thread(void* args)
 {
     (void)args;
     xinput_service_server();
+    service_thread_id = 0;
     return NULL;
 }
 #endif
@@ -880,10 +930,13 @@ void xinput_service_rundll(void)
 #else
     //xinput_service_set_autoshutdown(0);
     
-    pthread_t tid;
-    if(pthread_create(&tid, NULL, xinput_service_server_thread, NULL) == 0)
+    if(service_thread_id == 0)
     {
-        service_thread_id = tid;
+        pthread_t tid;
+        if(pthread_create(&tid, NULL, xinput_service_server_thread, NULL) == 0)
+        {
+            service_thread_id = tid;
+        }
     }
 #endif
 }

@@ -24,6 +24,8 @@
  * SOFTWARE.
  */
 
+#error "do not build"
+
 #define xinput_driver_initialize xinput_linux_joystick_initialize
 #define xinput_driver_probe xinput_linux_joystick_probe
 #define xinput_driver_get_device xinput_linux_joystick_get_device

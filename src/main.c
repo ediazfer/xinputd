@@ -34,6 +34,7 @@
  */
 int main(int argc, char** argv)
 {
+    printf("%s built on " __DATE__, argv[0]);
     server(0);
     
     return (EXIT_SUCCESS);

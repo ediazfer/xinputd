@@ -205,7 +205,7 @@ static int xinput_gamepad_service_is_alive(void)
     
     if(client_shared == NULL)
     {
-        return 0;
+        return -1;
     }
 
     /* give 5 tries to get the master */
@@ -227,7 +227,10 @@ static int xinput_gamepad_service_is_alive(void)
         usleep(XINPUT_OWNER_PROBE_PERIOD_US);
     }
 
-    TRACE("still owned by pid %i\n", pid);
+    if(pid != 0)
+    {
+        TRACE("still owned by pid %i\n", pid);
+    }
 
     /* owner 0 or "broken" means surely dead */
 
@@ -461,7 +464,7 @@ BOOL xinput_gamepad_connected(int index)
 
     if(client_shared == NULL)
     {
-        TRACE("shared memory not mapped, initialized=%i\n", xinput_gamepad_init_done);
+        TRACE("shared memory not mapped, initialised=%i\n", xinput_gamepad_init_done);
         return ret;
     }
 
